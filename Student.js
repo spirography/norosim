@@ -14,6 +14,8 @@ function Student(residence) {
     this.nameL = LNAMES[Math.floor(Math.random()*LNAMES.length)];
     this.year = 1 + Math.floor(Math.random()*4); // 1 = freshman, 2 = sophomore, etc
 
+    this.infected = 0; // slowly progresses (0-1 is incubation period, anything further is full blown infection)
+
     // personality
     // affects how student spends their free time
     // each one is a value from 0 to 1
@@ -198,12 +200,12 @@ function Student(residence) {
                 this.dorm.students.push(this);
                 this.finished += 60;
                 return;
-
-
             }
 
         }
     }
+
+
 
     return this;
 }

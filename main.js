@@ -69,9 +69,12 @@ function update() {
     var timestamp = day*24*60 + time;
     // for every student, check if they have stuff to do
     for (var i = 0; i < BUILDINGS.length; i++) {
+        var infectedScoreForBuilding = 0;
         var list = BUILDINGS[i].students;
         for (var j = 0; j < list.length; j++) {
             var student = list[j];
+            infectedScoreForBuilding += Math.min(1, student.infected);
+
             // check if they are finished with their current activity
             if (student.finished <= timestamp) {
                 // remove from current building
@@ -102,7 +105,7 @@ function update() {
 
 function initialize() {
     numStudents = 0, numInfected = 0, numSick = 0;
-    day = 1, hour = 0, minute = 0;
+    day = 0, hour = 0, minute = 0;
     // create students
     for (var i = 0; i < BUILDINGS.length; i++) {
         // list of students currently in the building
@@ -171,6 +174,10 @@ function initialize() {
     clock = document.createElement("div");
     clock.setAttribute("id", "clock");
     gui.appendChild(clock);
+
+    // infect patient zero!
+    randomArrayElement(BUILDINGS[0].students).infected = 0.1;
+    numInfected++;
 
     console.log("initialized");
 
@@ -286,10 +293,11 @@ function createVectorMap() {
         if (tooltip) {
             var x = e.pageX + 10;
             var y = e.pageY - 3;
-            if (window.innerWidth < x + 210) {
+            // shift it to the other side of the mouse if near the right/bottom of the screen
+            if (window.innerWidth + window.pageXOffset < x + 210) {
                 x -= 225;
             }
-            if (window.innerHeight < y + 100) {
+            if (window.innerHeight + window.pageYOffset < y + 230) {
                 y -= 220;
             }
             tooltip.style.left = x + "px";

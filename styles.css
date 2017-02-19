@@ -74,14 +74,7 @@ input[type="text"]:focus {
     background: white;
     border-top:  1px solid black;
     border-left: 1px solid black;
-}
-
-#upgrades:hover {
-    background: #aaa;
-}
-#upgrades:active {
-    background: #333;
-    color: white;
+    transition: background 0.2s, color 0.2s;
 }
 
 
@@ -96,9 +89,10 @@ input[type="text"]:focus {
 
 #upgradeScreen {
     position: fixed;
-    top: 100px;
-    left: 50px;
-    margin: auto;
+    top: -50%;
+    left: 50%;
+    margin-top: 480px;
+    margin-left: -350px;
     width: 650px;
     height: 300px;
     background: black;
@@ -113,7 +107,7 @@ input[type="text"]:focus {
     float: right;
     overflow-y: scroll;
 }
-#sidebar h1 {
+#sidebar h2 {
     text-align: center;
 }
 #sidebar p {
@@ -126,6 +120,10 @@ input[type="text"]:focus {
     background: red;
     margin: auto;
     display: none;
+    font-size: 36px;
+    text-align: center;
+    line-height: 80px;
+    margin-bottom: 16px;
 }
 
 #purchase:hover {
@@ -133,4 +131,21 @@ input[type="text"]:focus {
 }
 #purchase:active {
     background: #600;
+}
+
+
+#close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 32px;
+    padding: 0px 10px;
+    transition: background 0.2s, color 0.2s;
+}
+#close:before {
+    content:"✖";
+}
+#close:hover, #upgrades:hover {
+    background: black;
+    color: white;
 }

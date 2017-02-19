@@ -159,13 +159,19 @@ function Disease(name) {
 createUpgradesScreen();
 
 
-function createUpgradesScreen(evt) {
-    console.log(evt);
+function createUpgradesScreen() {
+    console.log("creating upgrades screen...");
     var div = document.createElement("div");
     div.setAttribute("id", "upgradeScreen");
     var sidebar = document.createElement("div");
     sidebar.setAttribute("id", "sidebar");
-    sidebar.innerHTML = '<h2></h2><p></p><div id="purchase"></div>';
+    sidebar.innerHTML = '<h2>Upgrades</h2><p>You can purchase upgrades on this screen to help you infect more people.  Spend your points wisely!</p>';
+    var buyButton = document.createElement("div");
+    buyButton.setAttribute("id", "purchase");
+    sidebar.appendChild(buyButton);
+    var close = document.createElement("div");
+    close.setAttribute("id", "close");
+    sidebar.appendChild(close);
     var svgns = "http://www.w3.org/2000/svg";
 
     grid = document.createElementNS(svgns, "svg");
@@ -204,11 +210,13 @@ function createUpgradesScreen(evt) {
         }
     }
     // when an upgrade is purchased, add it to the upgrade list and reveal more upgrades in the tree
-    sidebar.addEventListener("click", function(event) {
+    buyButton.addEventListener("click", function(event) {
         var upgrade = UPGRADES[parseInt(this.value)];
 
         Disease.upgrades.push(upgrade);
         Disease.money -= upgrade.cost;
+
+        buyButton.style.display = "none";
 
         var row = upgrade.xPos, col = upgrade.yPos;
 
@@ -230,25 +238,34 @@ function createUpgradesScreen(evt) {
                             }
                         }
 
-
-
-
                         // unpurchased polygons are revealed
                         if (!isBought) {
                             polygons[n].style.fill = "#FF7777";
                             // events
                             polygons[n].addEventListener("click", function (event) {
                                 var sidebar = document.getElementById("sidebar");
+                                var buyButton = document.getElementById("purchase");
                                 var upgrade = UPGRADES[parseInt(this.getAttribute("index"))];
-                                sidebar.value = this.getAttribute("index");
-                                sidebar.children[0].innerText = upgrade.name + "\n" + upgrade.xPos + ", " + upgrade.yPos;
+                                buyButton.value = this.getAttribute("index");
+                                sidebar.children[0].innerText = upgrade.name;
                                 sidebar.children[1].innerText = upgrade.desc;
-                                sidebar.children[2].innerText = "Cost: " + upgrade.cost;
-                                sidebar.children[2].style.display = "block";
+                                // check if upgrade is owned
+                                var alreadyPurchased = false;
+                                for (var o = 0; o < Disease.upgrades.length; o++) {
+                                    if (upgrade === Disease.upgrades[o]) {
+                                        alreadyPurchased = true;
+                                        break;
+                                    }
+                                }
+                                if (alreadyPurchased) {
+                                    buyButton.style.display = "none";
+                                } else {
+                                    buyButton.innerText = "Cost: " + upgrade.cost;
+                                    buyButton.style.display = "block";
+                                }
+
                             }, false);
                         }
-
-
                     }
                 }
             }
@@ -264,6 +281,12 @@ function createUpgradesScreen(evt) {
     document.body.appendChild(div);
 
     // set starting upgrade to be purchased automatically
-    sidebar.value = 0;
-    sidebar.dispatchEvent(new MouseEvent("click", {view: window, bubbles: true, cancelable: true}));
+    buyButton.value = 0;
+    buyButton.dispatchEvent(new MouseEvent("click", {view: window, bubbles: true, cancelable: true}));
+
+
+    // close button closes things
+    close.addEventListener("click", function(event) {
+        div.style.display = "none";
+    });
 }
