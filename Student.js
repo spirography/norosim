@@ -211,7 +211,7 @@ function Student(residence) {
         // chance of being infected
         if (this.infected === 0) {
             var infectionChance = Disease.getInfectionChance(building) * Math.sqrt(duration+100) * 1000000000;
-            infectionChance = 0.001 - (timestamp / 100000000) + Disease.infectivity/1000;
+            infectionChance = 0.001 - (0 / 100000000) + Disease.infectivity/1000;
 
             if (Math.random() < infectionChance) {
                 this.infected = 0.1; // INFECTED!

@@ -122,7 +122,7 @@ function update() {
 
 function initialize() {
     numStudents = 0, numInfected = 0, numSick = 0;
-    day = 0, hour = 0, minute = 0;
+    day = 1, hour = 0, minute = 0;
 
     // upgrade window
     createUpgradesScreen();
