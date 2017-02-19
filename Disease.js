@@ -156,8 +156,6 @@ function Disease(name) {
     this.upgrades = []; // list of bought upgrades
 }
 
-createUpgradesScreen();
-
 
 function createUpgradesScreen() {
     console.log("creating upgrades screen...");

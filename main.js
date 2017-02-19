@@ -25,13 +25,36 @@ var tooltip;
 var clock;
 var svg, g;
 
-// map is a graph containing connections between
-createVectorMap();
+
+
+// initial stuff
+document.getElementById("input").onkeypress = function(event) {
+    if (event.keyCode === 13) { // success
+        console.log("return pressed");
+        document.getElementById("input").remove();
+        document.getElementById("title").innerText = "You have chosen the name 'Norovirus'\nStarting game...";
+
+        var opacity = 1;
+        var interval = window.setInterval(function() {
+            opacity -= 0.02;
+            document.getElementById("container").style.opacity = opacity;
+            console.log("jdhfsa");
+            if (opacity <= 0) {
+                initialize();
+                document.getElementById("container").remove();
+                clearInterval(interval);
+            }
+        }, 50);
+    }
+}
+
+
+
 
 
 pruneCourses();
 
-initialize();
+// initialize();
 
 
 
@@ -106,6 +129,12 @@ function update() {
 function initialize() {
     numStudents = 0, numInfected = 0, numSick = 0;
     day = 0, hour = 0, minute = 0;
+
+    // upgrade window
+    createUpgradesScreen();
+    // create vector map
+    createVectorMap();
+
     // create students
     for (var i = 0; i < BUILDINGS.length; i++) {
         // list of students currently in the building
