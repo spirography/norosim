@@ -25,6 +25,7 @@ var tooltip;
 var clock;
 var svg, g;
 
+pruneCourses();
 
 
 // initial stuff
@@ -38,7 +39,6 @@ document.getElementById("input").onkeypress = function(event) {
         var interval = window.setInterval(function() {
             opacity -= 0.02;
             document.getElementById("container").style.opacity = opacity;
-            console.log("jdhfsa");
             if (opacity <= 0) {
                 initialize();
                 document.getElementById("container").remove();
@@ -47,15 +47,6 @@ document.getElementById("input").onkeypress = function(event) {
         }, 50);
     }
 }
-
-
-
-
-
-pruneCourses();
-
-// initialize();
-
 
 
 
@@ -69,7 +60,7 @@ function updateLoop() {
 
         // update clock
         // clock.innerText = ("00" + hour).slice(-2) + ":" + ("00" + minute).slice(-2);
-        clock.innerHTML = "Day " + day + "<br>" + ("00" + ((hour+11) % 12 + 1)).slice(-2) + ":00" + (hour >= 12 ? "pm" : "am");
+        clock.innerHTML = '<span style="font-size: 24px;">' + numInfected + " / " + numStudents + " infected</span><br><span>Day " + day + "<br>" + ("00" + ((hour+11) % 12 + 1)).slice(-2) + ":00" + (hour >= 12 ? "pm" : "am</span>");
         minute += UPDATE_INTERVAL;
         while (minute >= 60) {
             minute -= 60;
@@ -92,11 +83,9 @@ function update() {
     var timestamp = day*24*60 + time;
     // for every student, check if they have stuff to do
     for (var i = 0; i < BUILDINGS.length; i++) {
-        var infectedScoreForBuilding = 0;
         var list = BUILDINGS[i].students;
         for (var j = 0; j < list.length; j++) {
             var student = list[j];
-            infectedScoreForBuilding += Math.min(1, student.infected);
 
             // check if they are finished with their current activity
             if (student.finished <= timestamp) {
@@ -104,7 +93,8 @@ function update() {
                 BUILDINGS[i].students.splice(j, 1);
                 j--; // don't skip over the next student, everyone else has index reduced by 1
 
-                student.chooseNextActivity(day, hour, minute, BUILDINGS[i]);
+                var duration = student.chooseNextActivity(day, hour, minute, BUILDINGS[i]);
+                student.exposeToInfection(duration, BUILDINGS[i]);
 
             }
         }
@@ -121,6 +111,10 @@ function update() {
     // update tooltip
     var b = BUILDINGS[parseInt(tooltip.value)].students.length
     tooltip.children[3].innerText = b + " student" + (b !== 1 ? "s" : "");
+
+    if (numInfected <= 0) {
+        console.log("EVERYONE CURED!  YOU FAIL!");
+    }
 
     // console.log(DAYS_OF_WEEK[day % 7] + ", January " + (15+day) + ", " + hour + ":" + (minute < 10 ? "0" : "") + minute);
 }

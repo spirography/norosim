@@ -101,7 +101,7 @@ input[type="text"]:focus {
     position: fixed;
     top: -50%;
     left: 50%;
-    margin-top: 480px;
+    margin-top: 420px;
     margin-left: -350px;
     width: 650px;
     height: 300px;

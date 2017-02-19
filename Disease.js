@@ -154,6 +154,19 @@ function Disease(name) {
     this.resDrug = 0;
 
     this.upgrades = []; // list of bought upgrades
+
+    this.getInfectionChance = function(building) {
+        if (building.students.length === 0) {
+            return 0;
+        }
+        // get infection score of infected students
+        var infectionScore = 0;
+        for (var i = 0; i < building.students.length; i++) {
+            infectionScore += Math.min(1, building.students[i].infected);
+        }
+        infectionScore = Math.sqrt(infectionScore / building.students.length * (10 + this.infectivity + this.severity/2));
+        return infectionScore;
+    }
 }
 
 

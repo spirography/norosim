@@ -15,6 +15,7 @@ function Student(residence) {
     this.year = 1 + Math.floor(Math.random()*4); // 1 = freshman, 2 = sophomore, etc
 
     this.infected = 0; // slowly progresses (0-1 is incubation period, anything further is full blown infection)
+    this.isIncubating = false;
 
     // personality
     // affects how student spends their free time
@@ -109,19 +110,19 @@ function Student(residence) {
                 // go to random building
                 randomArrayElement(BUILDINGS).students.push(this);
                 this.finished = nextTime - 5;
-                return;
+                return this.finished - this.timestamp;
             } else {
                 // go to class
                 BUILDINGS[next.building].students.push(this);
                 this.finished = day*24*60 + next.endH*60+next.endM;
-                return;
+                return this.finished - this.timestamp;
             }
         } else { // is free for the rest of the day
             if (timestamp >= day*24*60 + 23*60 || hour < 5) { // late at night: go to sleep
                 // sleep until the next morning
                 this.dorm.students.push(this);
                 this.finished = timestamp + 8*60;
-                return;
+                return this.finished - this.timestamp;
             } else {
                 // free time
 
@@ -136,18 +137,18 @@ function Student(residence) {
                             // eat there
                             prevBuilding.students.push(this);
                             this.finished = timestamp + 40; // eat for 40 minutes
-                            return;
+                            return this.finished - this.timestamp;
                         } else { // just eat at a random place
                             food = randomArrayElement(FOOD_PLACES);
                             food.building.students.push(this);
                             this.finished = timestamp + 50;
-                            return;
+                            return this.finished - this.timestamp;
                         }
                     } else {
                         food = randomArrayElement(FOOD_PLACES);
                         food.building.students.push(this);
                         this.finished = timestamp + 50;
-                        return;
+                        return this.finished - this.timestamp;
                     }
                 }
 
@@ -157,19 +158,19 @@ function Student(residence) {
                             // randomly choose one of the gyms
                             randomArrayElement(ATHLETICS_PLACES).students.push(this);
                             this.finished += 2*60;
-                            return;
+                            return this.finished - this.timestamp;
                         }
                     } else if (hour > 20) {
                         if (Math.random() + this.sociability + (this.traits >> 3 & 1)/2 > 1.2) {
                             // get plastered at a frat house
                             BUILDINGS[randomArrayElement(FRATS)].students.push(this);
                             this.finished = 3*60 + Math.random()*180;
-                            return;
+                            return this.finished - this.timestamp;
                         } else {
                             // go do dorm and sleep
                             this.dorm.students.push(this);
                             this.finished = day*24*60 + 23*60 + 5;
-                            return;
+                            return this.finished - this.timestamp;
                         }
                     }
                 } else {
@@ -178,31 +179,70 @@ function Student(residence) {
                         // randomly choose one of the gyms
                         randomArrayElement(ATHLETICS_PLACES).students.push(this);
                         this.finished += 2*60;
-                        return;
+                        return this.finished - this.timestamp;
                     } else if (Math.random() + this.perserverence + (this.traits >> 4)/2 > 1.3) {
                         // just go to a random building and study
                         randomArrayElement(BUILDINGS).students.push(this);
                         this.finished += 60;
-                        return;
+                        return this.finished - this.timestamp;
                     } else if (Math.random() + (this.traits >> 3) > 1.5) {
                         // go to chapel
                         BUILDINGS[57].students.push(this);
                         this.finished += 2*60;
-                        return;
+                        return this.finished - this.timestamp;
                     } else {
                         // go to rush rhees
                         BUILDINGS[18].students.push(this);
                         this.finished += 60;
-                        return;
+                        return this.finished - this.timestamp;
                     }
                 }
                 // go to dorm
                 this.dorm.students.push(this);
                 this.finished += 60;
-                return;
+                return this.finished - this.timestamp;
             }
 
         }
+    }
+
+    // student has a chance of being infected
+    this.exposeToInfection = function(duration, building) {
+        // chance of being infected
+        if (this.infected === 0) {
+            var infectionChance = Disease.getInfectionChance(building) * Math.sqrt(duration+100) * 1000000000;
+            infectionChance = 0.001 - (timestamp / 100000000) + Disease.infectivity/1000;
+
+            if (Math.random() < infectionChance) {
+                this.infected = 0.1; // INFECTED!
+                this.isIncubating = true;
+                // console.log("STUDENT INFECTED!");
+                numInfected++;
+            }
+
+        } else {
+            // infection rises up, but also lowers based on treatment potency at the time
+            if (this.isIncubating) {
+                this.infected += 0.02;
+                if (this.infected >= 1) {
+                    this.isIncubating = false;
+                    numSick++;
+                }
+
+            } else {
+                this.infected -= 0.01;
+            }
+
+            if (this.infected <= 0) {
+                this.infected = 0;
+                numInfected--;
+                if (!this.isIncubating) {
+                    numSick--;
+                }
+            }
+
+        }
+
     }
 
 
